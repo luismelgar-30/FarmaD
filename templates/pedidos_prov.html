@@ -1,0 +1,221 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Pedidos a Proveedores{% endblock %}
+{% block title %}Pedidos a Proveedores{% endblock %}
+
+{% block additional_css %}
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='productos_crud.css') }}">
+    <style>
+        
+        .table-responsive table {
+            min-width: 900px;
+        }
+        
+        .alerta-proceso { background-color: #f7dc6f; color: #b7950b; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
+        .alerta-recibido { background-color: #d4edda; color: #155724; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
+        .alerta-cancelado { background-color: #f8d7da; color: #721c24; font-weight: 600; padding: 4px 8px; border-radius: 4px; }
+        
+        
+        .estado-proceso { background-color: #3498db; } /* Azul */
+        .estado-cancelado { background-color: #e74c3c; } /* Rojo */
+        .estado-recibido { background-color: #2ecc71; } /* Verde */
+
+        
+        .status-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            color: white;
+            transition: opacity 0.2s, transform 0.1s;
+            margin-right: 5px;
+        }
+        .status-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    
+    <div class="content-section">
+        <a href="{{ url_for('home') }}" class="btn btn-bback">Regresar al Menú</a> 
+        <h2 class="section-title">Generar Nuevo Pedido a Proveedor</h2>
+        
+       
+        <form id="add-pedido-form" class="form-grid" method="POST" action="{{ url_for('pedidos_prov.agregar_pedido') }}">
+            
+            <div class="form-group">
+                
+                <label for="proveedor_add">Proveedor:</label>
+                <select id="proveedor_add" name="proveedor" required>
+                    <option value="">Selecciona Proveedor</option>
+                    {% for p in proveedores %}
+                       
+                        <option value="{{ p.nombre }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="producto_add">Producto (Inventario):</label>
+                <select id="producto_add" name="producto" required onchange="updatePrice()">
+                    <option value="">Selecciona Producto</option>
+                    {% for prod in productos %}
+                        
+                        <option value="{{ prod.nombre }}" data-price="{{ prod.precio }}">{{ prod.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="precio_add">Precio Unitario (Automático):</label>
+                
+                <input type="number" id="precio_add" name="precio" step="0.01" readonly required style="background-color: #f8f8f8;">
+            </div>
+
+            <div class="form-group">
+                <label for="cantidad_add">Cantidad:</label>
+                <input type="number" id="cantidad_add" name="cantidad" required min="1" oninput="calculateTotal()">
+            </div>
+            
+            <div class="form-group">
+                <label for="suma_total_add">Suma Total (Precio * Cantidad):</label>
+                
+                <input type="number" id="suma_total_add" name="suma_total" step="0.01" readonly required style="background-color: #f8f8f8;">
+            </div>
+
+            <div class="form-group">
+                <label for="estipulado_add">Tiempo Estipulado:</label>
+                <select id="estipulado_add" name="estipulado" required>
+                    <option value="10 dias">10 días</option>
+                    <option value="1 dia">1 día</option>
+                    <option value="1 mes">1 mes</option>
+                    <option value="15 dias">15 días</option>
+                    <option value="7 dias">7 días</option>
+                    <option value="otro">Otro</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="submit-button" style="grid-column: 1 / -1; background-color: #3498db;">Generar Pedido</button>
+        </form>
+    </div>
+
+    
+    <div class="content-section">
+        <h2 class="section-title">Historial de Pedidos Generados (Total: {{ pedidos | length }})</h2>
+        
+        <div class="table-responsive">
+            <table id="pedidos-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Proveedor</th>
+                        <th>Producto</th>
+                        <th>Fecha Pedido</th>
+                        <th>Estipulado</th>
+                        <th>Cantidad</th>
+                        <th>Precio Unit.</th>
+                        <th>Suma Total</th>
+                        <th>Alerta (Estado)</th>
+                        <th style="min-width: 180px;">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for p in pedidos %}
+                    <tr>
+                        <td>{{ p.id_pedido_prov }}</td>
+                        <td>{{ p.proveedor }}</td>
+                        <td>{{ p.producto }}</td>
+                        <td>{{ p.fecha }}</td>
+                        <td>{{ p.estipulado }}</td>
+                        <td>{{ p.cantidad }}</td>
+                        <td>${{ p.precio | round(2) }}</td>
+                        <td><span style="font-weight: 700;">${{ p.suma_total | round(2) }}</span></td>
+                        <td>
+                            
+                            <span class="alerta-{{ p.alerta | lower | replace(' ', '-') }}">
+                                {{ p.alerta }}
+                            </span>
+                        </td>
+                        <td class="action-buttons">
+                            
+                            {% if p.alerta == 'En proceso' %}
+                                
+                               
+                                <form method="POST" action="{{ url_for('pedidos_prov.actualizar_estado', id_pedido=p.id_pedido_prov) }}" style="display:inline;">
+                                    <input type="hidden" name="estado" value="Recibido">
+                                    <button type="submit" class="status-btn estado-recibido">Recibido</button>
+                                </form>
+
+                                
+                                <form method="POST" action="{{ url_for('pedidos_prov.actualizar_estado', id_pedido=p.id_pedido_prov) }}" style="display:inline;">
+                                    <input type="hidden" name="estado" value="Cancelado">
+                                    <button type="submit" class="status-btn estado-cancelado">Cancelar</button>
+                                </form>
+
+                            {% else %}
+                                
+                                <span style="font-size: 0.8em; color: #6c757d;">Acción completada</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="10" class="text-center">No hay pedidos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+
+    <script>
+        
+        const productsMap = {
+            {% for prod in productos %}
+                "{{ prod.nombre }}": parseFloat("{{ prod.precio | default(0.0) }}"),
+            {% endfor %}
+        };
+        
+        
+        const selectProducto = document.getElementById('producto_add');
+        const inputPrecio = document.getElementById('precio_add');
+        const inputCantidad = document.getElementById('cantidad_add');
+        const inputTotal = document.getElementById('suma_total_add');
+
+        function updatePrice() {
+            const selectedProductName = selectProducto.value;
+            
+            const price = productsMap[selectedProductName] || 0.00;
+            
+            inputPrecio.value = price.toFixed(2);
+            calculateTotal();
+        }
+
+        
+        function calculateTotal() {
+            const precio = parseFloat(inputPrecio.value) || 0;
+            const cantidad = parseInt(inputCantidad.value) || 0;
+            
+            const total = precio * cantidad;
+            
+            
+            inputTotal.value = total.toFixed(2);
+        }
+
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            if (selectProducto.value) {
+                updatePrice();
+            }
+        });
+
+    </script>
+{% endblock %}

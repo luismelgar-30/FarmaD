@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Pantalla de Productos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='admin_dashboard.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='productos_crud.css') }}">
+    <style>
+        .header-buttons .btn-back {
+            background-color: #007bff;
+            transition: background-color 0.2s;
+        }
+        .header-buttons .btn-back:hover {
+            background-color: #007bff;
+        }
+    </style>
+</head>
+
+<body>
+{% extends "base_admin.html" %}
+
+{% block header_buttons %}
+    <a href="{{ url_for('home') }}" class="btn-bback">Regresar al Menú</a> 
+    <a href="#" class="btn">Opciones</a> 
+    <a href="#" class="btn">Datos</a>
+{% endblock %}
+
+{% block content %}
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="content-section">
+        <a href="http://127.0.0.1:5000/home" class="btn btn-bback" style="margin-bottom: 15px; display: inline-block;">Ir al inicio</a>
+        <h2 class="section-title">Agregar Nuevo Producto</h2>
+        
+        <form id="formProducto" method="POST" action="{{ url_for('productos.agregar_producto') }}" class="form-grid">
+            
+            <div class="form-group">
+                <label for="nombre">Nombre del Producto:</label>
+                <input type="text" id="nombre" name="nombre" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoria">Categoría:</label>
+                <input type="text" id="categoria" name="categoria" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="tipo">Tipo (Sólido, Líquido, etc.):</label>
+                <select id="tipo" name="tipo" required>
+                    <option value="">Selecciona Tipo</option>
+                    {% for t in tipos %}
+                        <option value="{{ t }}">{{ t }}</option>
+                    {% endfor %}
+                    {% if 'Otro' not in tipos %}
+                        <option value="Otro">Otro</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="aceptado">Aceptado (Edad):</label>
+                <select id="aceptado" name="aceptado" required>
+                    <option value="">Selecciona Edad</option>
+                    {% for a in aceptado %}
+                        <option value="{{ a }}">{{ a }}</option>
+                    {% endfor %}
+                    {% if 'Otro' not in aceptado %}
+                        <option value="Otro">Otro</option>
+                    {% endif %}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="cantidad">Cantidad (Valor Numérico):</label>
+                <input type="number" id="cantidad" name="cantidad" required min="0" max="1000">
+            </div>
+
+            <div class="form-group">
+                <label for="tipocantidad">Unidad (Litro, MG, etc.):</label>
+                <select id="tipocantidad" name="tipocantidad" required>
+                    <option value="">Selecciona Unidad</option>
+                    {% for tc in tipocantidad %}
+                        <option value="{{ tc }}">{{ tc }}</option>
+                    {% endfor %}
+                    {% if 'Otro' not in tipocantidad %}
+                        <option value="Otro">Otro</option>
+                    {% endif %}
+                </select>
+            </div>
+
+            <button type="submit" class="submit-button">Guardar Producto</button>
+        </form>
+    </div>
+
+    <div class="content-section table-section">
+        <h2 class="section-title">Inventario Actual (Total: {{ total_productos }})</h2>
+
+        <div class="pagination-controls">
+            <label for="per_page">Mostrar:</label>
+            <select id="per_page" onchange="window.location.href = '{{ url_for('productos.listar_productos') }}?page=1&per_page=' + this.value">
+                {% for count in [10, 15, 20] %}
+                    <option value="{{ count }}" {% if per_page == count %}selected{% endif %}>{{ count }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Categoría</th>
+                        <th>Tipo</th>
+                        <th>Aceptado</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for producto in productos %}
+                    <tr>
+                        <td>{{ producto.id_producto }}</td>
+                        <td>{{ producto.nombre }}</td>
+                        <td>{{ producto.categoria }}</td>
+                        <td>{{ producto.tipo }}</td>
+                        <td>{{ producto.aceptado }}</td>
+                        <td>{{ producto.cantidad }}</td>
+                        <td>{{ producto.tipo_cantidad }}</td>
+                        <td class="action-buttons">
+                            <button class="edit-btn" 
+                                data-id="{{ producto.id_producto }}" 
+                                data-nombre="{{ producto.nombre }}"
+                                data-categoria="{{ producto.categoria }}"
+                                data-tipo="{{ producto.tipo }}"
+                                data-aceptado="{{ producto.aceptado }}"
+                                data-cantidad="{{ producto.cantidad }}"
+                                data-tipocantidad="{{ producto.tipo_cantidad }}"
+                                onclick="openEditModal(this)">
+                                Editar
+                            </button>
+
+                            <form method="POST" action="{{ url_for('productos.eliminar_producto', id_producto=producto.id_producto) }}" style="display:inline;" onsubmit="return confirm('¿Está seguro de que desea eliminar el producto {{ producto.nombre }}?')">
+                                <button type="submit" class="delete-btn">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" class="text-center">No hay productos registrados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination-links">
+            {% if page > 1 %}
+                <a href="{{ url_for('productos.listar_productos', page=page-1, per_page=per_page) }}" class="page-link">Anterior</a>
+            {% else %}
+                <span class="page-link disabled">Anterior</span>
+            {% endif %}
+
+            <span class="page-info">Página {{ page }} de {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+                <a href="{{ url_for('productos.listar_productos', page=page+1, per_page=per_page) }}" class="page-link">Siguiente</a>
+            {% else %}
+                <span class="page-link disabled">Siguiente</span>
+            {% endif %}
+        </div>
+    </div>
+
+    
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeEditModal()">&times;</span>
+            <h3 class="modal-title">Editar Producto</h3>
+            
+            <form id="editForm" method="POST">
+                <input type="hidden" id="edit_id" name="id_producto" required>
+                
+                <div class="form-grid-modal">
+                    <div class="form-group">
+                        <label for="nombre_edit">Nombre del Producto:</label>
+                        <input type="text" id="nombre_edit" name="nombre_edit" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria_edit">Categoría:</label>
+                        <input type="text" id="categoria_edit" name="categoria_edit" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tipo_edit">Tipo:</label>
+                        <select id="tipo_edit" name="tipo_edit" required>
+                            {% for t in tipos %}
+                                <option value="{{ t }}">{{ t }}</option>
+                            {% endfor %}
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="aceptado_edit">Aceptado (Edad):</label>
+                        <select id="aceptado_edit" name="aceptado_edit" required>
+                            {% for a in aceptado %}
+                                <option value="{{ a }}">{{ a }}</option>
+                            {% endfor %}
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="cantidad_edit">Cantidad:</label>
+                        <input type="number" id="cantidad_edit" name="cantidad_edit" required min="0" max="1000">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tipocantidad_edit">Unidad:</label>
+                        <select id="tipocantidad_edit" name="tipocantidad_edit" required>
+                            {% for tc in tipocantidad %}
+                                <option value="{{ tc }}">{{ tc }}</option>
+                            {% endfor %}
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="submit-button save-edit-btn">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        
+        function validarTextoSoloLetras(valor) {
+            const regex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]{3,20}$/;
+            return regex.test(valor.trim());
+        }
+
+        function validarCantidad(valor) {
+            const num = Number(valor);
+            return !isNaN(num) && num >= 0 && num <= 1000;
+        }
+
+        document.getElementById('formProducto').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre').value;
+            const categoria = document.getElementById('categoria').value;
+            const cantidad = document.getElementById('cantidad').value;
+
+            if (!validarTextoSoloLetras(nombre)) {
+                alert('⚠️ El nombre debe tener solo letras, sin signos ni números, entre 3 y 20 caracteres.');
+                e.preventDefault();
+                return;
+            }
+
+            if (!validarTextoSoloLetras(categoria)) {
+                alert('⚠️ La categoría debe tener solo letras, sin signos ni números, entre 3 y 20 caracteres.');
+                e.preventDefault();
+                return;
+            }
+
+            if (!validarCantidad(cantidad)) {
+                alert('⚠️ La cantidad debe ser un número entre 0 y 1000.');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        document.getElementById('editForm').addEventListener('submit', function(e) {
+            const nombre = document.getElementById('nombre_edit').value;
+            const categoria = document.getElementById('categoria_edit').value;
+            const cantidad = document.getElementById('cantidad_edit').value;
+
+            if (!validarTextoSoloLetras(nombre)) {
+                alert('⚠️ El nombre debe tener solo letras, sin signos ni números, entre 3 y 20 caracteres.');
+                e.preventDefault();
+                return;
+            }
+
+            if (!validarTextoSoloLetras(categoria)) {
+                alert('⚠️ La categoría debe tener solo letras, sin signos ni números, entre 3 y 20 caracteres.');
+                e.preventDefault();
+                return;
+            }
+
+            if (!validarCantidad(cantidad)) {
+                alert('⚠️ La cantidad debe ser un número entre 0 y 1000.');
+                e.preventDefault();
+                return;
+            }
+        });
+
+        
+        const modal = document.getElementById('editModal');
+        const editForm = document.getElementById('editForm');
+        
+        function openEditModal(button) {
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre');
+            const categoria = button.getAttribute('data-categoria');
+            const tipo = button.getAttribute('data-tipo');
+            const aceptado = button.getAttribute('data-aceptado');
+            const cantidad = button.getAttribute('data-cantidad');
+            const tipocantidad = button.getAttribute('data-tipocantidad');
+
+            document.getElementById('edit_id').value = id;
+            document.getElementById('nombre_edit').value = nombre;
+            document.getElementById('categoria_edit').value = categoria;
+            document.getElementById('cantidad_edit').value = cantidad;
+            
+            document.getElementById('tipo_edit').value = tipo;
+            document.getElementById('aceptado_edit').value = aceptado;
+            document.getElementById('tipocantidad_edit').value = tipocantidad;
+
+            editForm.action = '{{ url_for('productos.editar_producto', id_producto=0) }}'.replace('0', id);
+
+            modal.style.display = 'flex'; 
+        }
+
+        function closeEditModal() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeEditModal();
+            }
+        }
+    </script>
+
+{% endblock %}
+</body>
+</html>

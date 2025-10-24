@@ -1,0 +1,141 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Devoluciones a Proveedores{% endblock %}
+{% block title %}Registro de Devoluciones a Proveedores{% endblock %}
+
+{% block additional_css %}
+    
+    <style>
+        
+        .content-section {
+            padding: 30px;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-top: 20px;
+        }
+        .section-title {
+            color: #333;
+            font-size: 24px;
+            margin-bottom: 5px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+        .section-subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 14px;
+        }
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            display: inline-block;
+            margin-bottom: 20px;
+            transition: background-color 0.3s;
+        }
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        #devoluciones-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 15px;
+        }
+        #devoluciones-table th, #devoluciones-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        #devoluciones-table th {
+            background-color: #007bff;
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 13px;
+            position: sticky; /* Fija el encabezado si la tabla es grande */
+            top: 0;
+        }
+        #devoluciones-table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+        
+        
+        .devolucion-total { 
+            background-color: #ffe0e6; /* Rojo muy claro para destacar */
+            color: #d63384; /* Tono rosa/rojo oscuro para el texto */
+            font-weight: 700; 
+            padding: 6px 10px; 
+            border-radius: 6px;
+            display: inline-block;
+        }
+        .text-center { text-align: center; }
+        
+        
+        #devoluciones-table thead tr th:first-child { border-top-left-radius: 8px; }
+        #devoluciones-table thead tr th:last-child { border-top-right-radius: 8px; }
+        
+    </style>
+{% endblock %}
+
+{% block content %}
+
+    
+    <div class="content-section">
+        
+        <a href="{{ url_for('home') }}" class="btn-back">Regresar al Menú</a> 
+        
+        <h2 class="section-title">Historial de Pagos Devueltos a Proveedores</h2>
+        <p class="section-subtitle">
+            Mostrando {{ devoluciones | length }} registros. Estos registros se generan automáticamente cuando un pedido a proveedor es marcado como 'Cancelado'.
+        </p>
+        
+        <div class="table-responsive">
+            <table id="devoluciones-table">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID Dev.</th>
+                        <th class="text-center">ID Pedido</th>
+                        <th>Proveedor</th>
+                        <th>Producto / Descripción</th>
+                        <th class="text-center">Monto Devuelto</th>
+                        <th>Fecha de Devolución</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for d in devoluciones %}
+                    <tr>
+                        <td class="text-center">{{ d.id_devolucion_prov }}</td>
+                        <td class="text-center">{{ d.id_pedido_prov }}</td>
+                        <td>{{ d.proveedor }}</td>
+                        <td>{{ d.producto }}</td>
+                        <td class="text-center">
+                            <span class="devolucion-total">${{ "{:,.2f}".format(d.devuelto | float) }}</span>
+                        </td>
+                        <td>{{ d.fecha }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="6" class="text-center">
+                            <p class="alert alert-info" style="margin: 10px 0;">
+                                No hay registros de devoluciones a proveedores aún 
+                                Se añadirán automáticamente cuando se cancele un pedido.
+                            </p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+{% endblock %}

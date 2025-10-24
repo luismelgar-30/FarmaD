@@ -1,0 +1,326 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Gestión de Inventario{% endblock %}
+{% block title %}Inventario{% endblock %}
+
+{% block content %}
+<div class="p-6">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='inventario.css') }}">
+    
+
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="mb-4">
+            {% for category, message in messages %}
+                <div class="p-3 rounded-lg text-white 
+                    {% if category == 'success' %}bg-green-500
+                    {% elif category == 'error' %}bg-red-500
+                    {% else %}bg-blue-500{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    
+    <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
+        <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-gray-700">Agregar Nuevo Artículo</h2>
+        <a href="{{ url_for('home') }}" class="btn btn-back">Regresar al Menú</a> 
+        <h1 class="text-3xl font-bold mb-6 text-gray-800">Gestión de Inventario</h1>
+        <form action="{{ url_for('inventario.inventario_home') }}" method="POST">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                
+                
+                <select name="producto" required 
+                        class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                    <option value="" disabled selected>Seleccione Producto</option>
+                    {% for name in productos_names %}
+                        <option value="{{ name }}">{{ name }}</option>
+                    {% endfor %}
+                </select>
+                
+                
+                <input type="number" name="cantidad" placeholder="Cantidad en Stock" required min="0"
+                       class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                       
+                
+                <input type="number" name="precio" placeholder="Precio Unitario" required step="0.01" min="0.01"
+                       class="p-3 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500">
+                
+                <input type="text" placeholder="Multiplicador (Automático)" disabled
+                       class="p-3 border border-gray-200 rounded-lg bg-gray-50 cursor-not-allowed text-gray-600">
+            </div>
+            <button type="submit" 
+                    class="mt-4 w-full bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-150 shadow-md">
+                Guardar Artículo
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-xl shadow-lg">
+        <h2 class="text-xl font-semibold mb-4 border-b pb-2 text-gray-700">Inventario Actual (Total: {{ total_registros|default(0) }})</h2>
+        
+        <form action="{{ url_for('inventario.inventario_home') }}" method="GET" class="mb-4 flex gap-2">
+            <input type="hidden" name="page" value="1"> 
+            
+            <input type="search" name="busqueda" placeholder="Buscar por nombre de producto..." 
+                   value="{{ search_query|default('') }}"
+                   class="p-3 border border-gray-300 rounded-lg flex-grow focus:ring-blue-500 focus:border-blue-500">
+            <button type="submit" 
+                    class="bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition duration-150">
+                Buscar
+            </button>
+        </form>
+        
+        <div class="overflow-x-auto rounded-lg shadow-md">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-800 text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">ID</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Producto</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Cantidad</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Precio Unit.</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Multiplicador Total</th>
+                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider">Alerta</th>
+                        <th class="px-6 py-3 text-center text-xs font-semibold uppercase tracking-wider">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in inventario %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.id_inventario }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ item.producto }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ item.cantidad }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${{ item.precio|round(2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${{ item.preciomulti|round(2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                            {% set alerta_class = {
+                                'Stock bajo': 'bg-red-100 text-red-800',
+                                'Stock regulado': 'bg-green-100 text-green-800',
+                                'Stock sobrepasado': 'bg-yellow-100 text-yellow-800'
+                            }.get(item.alerta, 'bg-gray-100 text-gray-800') %}
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {{ alerta_class }}">
+                                {{ item.alerta }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-center flex justify-center space-x-2">
+                            
+                            <button onclick="openEditModal({{ item.id_inventario }})"
+                                class="bg-yellow-500 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-yellow-600 transition duration-150">
+                                Editar
+                            </button>
+                            
+                            
+                            <button type="button" 
+                                    onclick="openDeleteConfirmModal({{ item.id_inventario }}, '{{ item.producto }}')"
+                                    class="bg-red-600 text-white px-3 py-1 rounded-lg text-xs font-medium hover:bg-red-700 transition duration-150">
+                                Eliminar
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-4 text-center text-gray-500">
+                            No se encontraron artículos en el inventario.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if total_pages > 1 %}
+        <div class="mt-4 flex justify-center items-center space-x-2">
+            {% if page > 1 %}
+                <a href="{{ url_for('inventario.inventario_home', page=page-1, busqueda=search_query) }}" 
+                   class="bg-gray-200 text-gray-800 px-3 py-1 rounded-lg hover:bg-gray-300 transition duration-150">Anterior</a>
+            {% else %}
+                <span class="bg-gray-100 text-gray-400 px-3 py-1 rounded-lg cursor-not-allowed">Anterior</span>
+            {% endif %}
+
+            <span class="px-3 py-1 text-sm font-semibold">Página {{ page }} de {{ total_pages }}</span>
+
+            {% if page < total_pages %}
+                <a href="{{ url_for('inventario.inventario_home', page=page+1, busqueda=search_query) }}" 
+                   class="bg-gray-200 text-gray-800 px-3 py-1 rounded-lg hover:bg-gray-300 transition duration-150">Siguiente</a>
+            {% else %}
+                <span class="bg-gray-100 text-gray-400 px-3 py-1 rounded-lg cursor-not-allowed">Siguiente</span>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+    </div>
+</div>
+
+<div id="editModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-lg">
+        <h2 class="text-2xl font-bold mb-4 border-b pb-2 text-gray-800">Editar Artículo de Inventario</h2>
+        
+        <form id="editForm" method="POST">
+            
+            <input type="hidden" id="current_page_edit" name="current_page" value="{{ page }}">
+            <input type="hidden" id="current_busqueda_edit" name="current_busqueda" value="{{ search_query }}">
+
+            <div class="space-y-4">
+                <div>
+                    <label for="producto_edit" class="block text-sm font-medium text-gray-700">Producto</label>
+                    <select id="producto_edit" name="producto_edit" required 
+                            class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">
+                        <option value="" disabled selected>Seleccione Producto</option>
+                        {% for name in productos_names %}
+                            <option value="{{ name }}">{{ name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label for="cantidad_edit" class="block text-sm font-medium text-gray-700">Cantidad</label>
+                    <input type="number" id="cantidad_edit" name="cantidad_edit" required min="0"
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label for="precio_edit" class="block text-sm font-medium text-gray-700">Precio Unitario</label>
+                    <input type="number" id="precio_edit" name="precio_edit" required step="0.01" min="0.01"
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-lg">
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                    <label class="block text-sm font-medium text-gray-700">Multiplicador Total (Auto)</label>
+                    <p id="preciomulti_display" class="mt-1 text-xl font-bold text-indigo-600">$0.00</p>
+                    <p class="text-xs text-gray-500">Se recalcula al guardar.</p>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button type="button" onclick="closeEditModal()" 
+                        class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-150">
+                    Cancelar
+                </button>
+                <button type="submit" 
+                        class="px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition duration-150">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="deleteConfirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm">
+        <h2 class="text-xl font-bold mb-4 text-red-600">Confirmar Eliminación</h2>
+        
+        <p class="text-gray-700 mb-6">¿Está seguro de que desea eliminar el artículo **<span id="articuloNameSpan" class="font-semibold"></span>** del inventario?</p>
+
+        <form id="deleteForm" method="POST" class="flex justify-end space-x-3">
+            
+            <input type="hidden" id="current_page_delete" name="current_page" value="{{ page }}">
+            <input type="hidden" id="current_busqueda_delete" name="current_busqueda" value="{{ search_query }}">
+
+            <button type="button" onclick="closeDeleteConfirmModal()" 
+                    class="px-4 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition duration-150">
+                Cancelar
+            </button>
+            <button type="submit" 
+                    class="px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition duration-150">
+                Eliminar Artículo
+            </button>
+        </form>
+    </div>
+</div>
+
+
+<script>
+    
+    const editModal = document.getElementById('editModal');
+    const editForm = document.getElementById('editForm');
+    const deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    const deleteForm = document.getElementById('deleteForm');
+
+    
+    function closeEditModal() {
+        editModal.classList.remove('flex');
+        editModal.classList.add('hidden');
+    }
+
+
+    function updatePreciomultiDisplay() {
+        const cantidad = parseFloat(document.getElementById('cantidad_edit').value) || 0;
+        const precio = parseFloat(document.getElementById('precio_edit').value) || 0;
+        const preciomulti = (cantidad * precio).toFixed(2);
+        document.getElementById('preciomulti_display').textContent = `$${preciomulti}`;
+    }
+
+    async function openEditModal(id) {
+        closeDeleteConfirmModal(); 
+        
+        try {
+            
+            const url = `{{ url_for('inventario.obtener_articulo', id_inventario=0) }}`.replace('0', id);
+            
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP: ${response.status} al obtener datos.`);
+            }
+            
+            const articulo = await response.json();
+            
+            if (!articulo || Object.keys(articulo).length === 0) {
+                 console.error('Error: No se encontró el artículo con ID ' + id);
+                 return;
+            }
+
+            
+            document.getElementById('producto_edit').value = articulo.producto;
+            document.getElementById('cantidad_edit').value = articulo.cantidad;
+            document.getElementById('precio_edit').value = articulo.precio;
+            
+            
+            updatePreciomultiDisplay();
+
+            document.getElementById('cantidad_edit').oninput = updatePreciomultiDisplay;
+            document.getElementById('precio_edit').oninput = updatePreciomultiDisplay;
+            
+            const editUrl = `{{ url_for('inventario.editar_articulo', id_inventario=0) }}`.replace('0', id);
+            editForm.action = editUrl;
+            
+            editModal.classList.remove('hidden');
+            editModal.classList.add('flex');
+
+        } catch (error) {
+            console.error('Hubo un error al cargar los datos de edición:', error);
+            
+        }
+    }
+    
+    function closeDeleteConfirmModal() {
+        deleteConfirmModal.classList.remove('flex');
+        deleteConfirmModal.classList.add('hidden');
+    }
+
+    function openDeleteConfirmModal(id, nombre) {
+        closeEditModal(); 
+        
+        
+        document.getElementById('articuloNameSpan').textContent = nombre;
+        
+        const deleteUrl = `{{ url_for('inventario.eliminar_articulo', id_inventario=0) }}`.replace('0', id);
+        deleteForm.action = deleteUrl;
+
+        deleteConfirmModal.classList.remove('hidden');
+        deleteConfirmModal.classList.add('flex');
+    }
+
+    window.onclick = function(event) {
+        if (event.target == editModal) {
+            closeEditModal();
+        }
+        if (event.target == deleteConfirmModal) {
+            closeDeleteConfirmModal();
+        }
+    }
+</script>
+
+{% endblock %}

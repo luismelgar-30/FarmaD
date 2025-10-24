@@ -1,0 +1,31 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Menú Principal{% endblock %}
+{% block title %}Menú Administrativo{% endblock %}
+
+{% block content %}
+<div class="cards-grid">
+
+    
+    {% if user_rol == 'administrador' %}
+        <a href="{{ url_for('productos.listar_productos') }}" class="option-card">Productos</a>
+        <a href="{{ url_for('inventario.inventario_home') }}" class="option-card">Inventario</a>
+        <a href="{{ url_for('proveedores.proveedores_home') }}" class="option-card">Proveedores</a>
+    {% endif %}
+
+    
+    <a href="{{ url_for('pedidos_prov.listar_pedidos') }}" class="option-card">Pedidos Proveedor</a>
+    <a href="{{ url_for('historico_prov.historico_prov') }}" class="option-card">Históricos de Proveedores</a>
+    <a href="{{ url_for('historico_inventario.historico_inventario') }}" class="option-card">Histórico de Inventario</a>
+    <a href="{{ url_for('stockconsulta') }}" class="option-card">
+        <i class="fas fa-boxes mr-1"></i> Stock (Consulta)
+    </a>
+
+    
+    {% if user_rol == 'administrador' %}
+        <a href="{{ url_for('usuarios.usuarios_home') }}" class="option-card">Usuarios</a>
+        <a href="{{ url_for('clientes.listar_clientes') }}" class="option-card">Clientes</a>
+
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú Principal - FarmaD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='menu.css') }}">
+</head>
+<body>
+
+    <div class="menu-container">
+
+        
+        
+        <h1>Bienvenido a Farmacia Melgar</h1>
+        
+        <div class="options-grid">
+            
+            <a href="{{ url_for('cliente') }}" class="option-card clients">
+                <span>CLIENTES</span>
+            </a>
+            
+            <a href="{{ url_for('login') }}" class="option-card admin">
+                <span>ADMINISTRACIÓN</span>
+            </a>
+            
+        </div>
+    </div>
+
+</body>
+</html>

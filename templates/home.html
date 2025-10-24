@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8"> 
+    <title>Inicio Farmacia Melgar</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <div class="form-container welcome-message">
+        <h1>¡Bienvenido, {{ nombre }}!</h1>
+        <p>Has iniciado sesión exitosamente en Farmacia Melgar.</p>
+        <a href="{{ url_for('logout') }}" class="logout-button">Cerrar Sesión</a>
+    </div>
+</body>
+</html>

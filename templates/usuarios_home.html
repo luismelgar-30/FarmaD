@@ -1,0 +1,123 @@
+{% extends "base_admin.html" %}
+{% block title %}Gestión de Usuarios{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='usuarios.css') }}">
+<a href="{{ url_for('home') }}" class="btn btn-back">Regresar al Menú</a>
+<h2 class="titulo">Gestión de Usuarios</h2>
+
+
+
+<form action="{{ url_for('usuarios.agregar_usuario') }}" method="POST" class="form-usuario" onsubmit="return validarFormularioNuevo()">
+    <input type="text" id="nombre_nuevo" name="nombre" placeholder="Nombre" required>
+    <input type="password" id="contrasena_nueva" name="contrasena" placeholder="Contraseña" required>
+    <input type="email" id="email_nuevo" name="email" placeholder="Correo electrónico" required>
+    <input type="text" id="telefono_nuevo" name="telefono" placeholder="Teléfono">
+    <button type="submit" class="btn-agregar">Agregar</button>
+</form>
+
+
+<table class="tabla-usuarios">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for u in usuarios %}
+        <tr>
+            <form action="{{ url_for('usuarios.editar_usuario', id_usuario=u.id_usuario) }}" method="POST" onsubmit="return validarFormularioEdicion(this)">
+                <td>{{ u.id_usuario }}</td>
+                <td><input type="text" name="nombre" value="{{ u.nombre }}" required></td>
+                <td><input type="email" name="email" value="{{ u.email }}" required></td>
+                <td><input type="text" name="telefono" value="{{ u.telefono }}"></td>
+                <td>
+                    <input type="password" name="contrasena" placeholder="Nueva contraseña" class="input-pass">
+                    <button type="submit" class="btn-guardar">Guardar</button>
+                </form>
+                <form action="{{ url_for('usuarios.eliminar_usuario', id_usuario=u.id_usuario) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn-eliminar" onclick="return confirm('¿Eliminar este usuario?')">Eliminar</button>
+                </form>
+                </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<script>
+function validarNombre(nombre) {
+    const regex = /^(?!.*  )[A-Za-zÁÉÍÓÚáéíóúÑñ ]{3,20}$/;
+    return regex.test(nombre);
+}
+
+function validarContrasena(contrasena) {
+    return contrasena.length >= 5 && contrasena.length <= 12;
+}
+
+function validarTelefono(telefono) {
+    const regex = /^[0-9]{8}$/;
+    return regex.test(telefono);
+}
+
+function validarCorreo(correo) {
+    const regex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+    const unicoArroba = (correo.match(/@/g) || []).length === 1;
+    return regex.test(correo) && unicoArroba && correo.length >= 10 && correo.length <= 25;
+}
+
+function validarFormularioNuevo() {
+    const nombre = document.getElementById("nombre_nuevo").value.trim();
+    const contrasena = document.getElementById("contrasena_nueva").value.trim();
+    const telefono = document.getElementById("telefono_nuevo").value.trim();
+    const correo = document.getElementById("email_nuevo").value.trim();
+
+    if (!validarNombre(nombre)) {
+        alert("❌ El nombre solo debe contener letras, sin números ni signos, sin dobles espacios, y tener entre 3 y 20 letras.");
+        return false;
+    }
+    if (!validarContrasena(contrasena)) {
+        alert("❌ La contraseña debe tener entre 5 y 12 caracteres.");
+        return false;
+    }
+    if (telefono && !validarTelefono(telefono)) {
+        alert("❌ El teléfono debe tener exactamente 8 dígitos numéricos.");
+        return false;
+    }
+    if (!validarCorreo(correo)) {
+        alert("❌ El correo debe tener entre 10 y 25 caracteres y solo un símbolo '@'.");
+        return false;
+    }
+    return true;
+}
+
+function validarFormularioEdicion(form) {
+    const nombre = form.nombre.value.trim();
+    const contrasena = form.contrasena.value.trim();
+    const telefono = form.telefono.value.trim();
+    const correo = form.email.value.trim();
+
+    if (!validarNombre(nombre)) {
+        alert("❌ El nombre solo debe contener letras, sin números ni signos, sin dobles espacios, y tener entre 3 y 20 letras.");
+        return false;
+    }
+    if (contrasena && !validarContrasena(contrasena)) {
+        alert("❌ La contraseña debe tener entre 5 y 12 caracteres.");
+        return false;
+    }
+    if (telefono && !validarTelefono(telefono)) {
+        alert("❌ El teléfono debe tener exactamente 8 dígitos numéricos.");
+        return false;
+    }
+    if (!validarCorreo(correo)) {
+        alert("❌ El correo debe tener entre 10 y 25 caracteres y solo un símbolo '@'.");
+        return false;
+    }
+    return true;
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base_admin.html" %}
+{% block page_title %}Gestión de Clientes{% endblock %}
+{% block title %}Pantalla de Clientes{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='clientes.css') }}">
+
+<div class="container-crud">
+    <h2>Gestión de Clientes</h2>
+    
+
+    <form action="{{ url_for('clientes.agregar_cliente') }}" method="POST" class="form-crud">
+        <input type="text" name="nombre" placeholder="Nombre" required>
+        <input type="email" name="correo" placeholder="Correo" required>
+        <input type="text" name="telefono" placeholder="Teléfono" required>
+        <input type="text" name="identidad" placeholder="Identidad" required>
+        <input type="number" name="edad" placeholder="Edad" min="0" required>
+        <input type="date" name="fecha_registro" required>
+        <button type="submit" class="btn-agregar">Agregar Cliente</button>
+        <a href="{{ url_for('home') }}" class="btn btn-back">Regresar al Menú</a> 
+    </form>
+
+    <table class="tabla-crud">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+                <th>Identidad</th>
+                <th>Edad</th>
+                <th>Fecha Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for c in clientes %}
+            <tr>
+                <form action="{{ url_for('clientes.editar_cliente', id_cliente=c[0]) }}" method="POST">
+                    <td>{{ c[0] }}</td>
+                    <td><input type="text" name="nombre" value="{{ c[1] }}" required></td>
+                    <td><input type="email" name="correo" value="{{ c[2] }}" required></td>
+                    <td><input type="text" name="telefono" value="{{ c[3] }}" required></td>
+                    <td><input type="text" name="identidad" value="{{ c[4] }}" required></td>
+                    <td><input type="number" name="edad" value="{{ c[5] }}" required></td>
+                    <td><input type="date" name="fecha_registro" value="{{ c[6]|safe }}" required></td>
+                    <td>
+                        <button type="submit" class="btn-editar">Editar</button>
+                        <a href="{{ url_for('clientes.eliminar_cliente', id_cliente=c[0]) }}" class="btn-eliminar" onclick="return confirm('¿Deseas eliminar este cliente?')">Eliminar</a>
+                    </td>
+                </form>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

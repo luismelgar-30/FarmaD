@@ -1,0 +1,83 @@
+.manual-container {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+}
+
+.manual-container h2 {
+    text-align: center;
+    color: #2980B9;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+.manual-section {
+    background-color: #ffffff;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    padding: 25px;
+    margin-bottom: 25px;
+    transition: transform 0.3s ease;
+}
+
+.manual-section:hover {
+    transform: translateY(-3px);
+}
+
+.manual-section h3 {
+    color: #1F618D;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.manual-section p {
+    font-size: 1rem;
+    margin-bottom: 15px;
+    color: #444;
+    line-height: 1.6;
+}
+
+.manual-image {
+    text-align: center;
+}
+
+.manual-image img {
+    max-width: 93%;
+    height: auto;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.manual-image img:hover {
+    transform: scale(1.05);
+}
+
+
+.manual-section:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+
+@media (max-width: 900px) {
+    .manual-image img {
+        max-width: 45%;
+    }
+}
+
+@media (max-width: 600px) {
+    .manual-section {
+        padding: 15px;
+    }
+
+    .manual-section p {
+        font-size: 0.95rem;
+    }
+
+    .manual-image img {
+        max-width: 70%;
+    }
+}

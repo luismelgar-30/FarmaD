@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Inventario</title>
+    <link rel="stylesheet" href="{{ url_for('historico_inventario.static', filename='historico_inventario.css') }}">
+
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 12px; color: #333; }
+        h1 { text-align: center; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #333; padding: 6px; text-align: left; }
+        th { background-color: #007BFF; color: #fff; }
+    </style>
+</head>
+<body>
+    <h1>Histórico de Inventario</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID Hist.</th>
+                <th>ID Inventario</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+                <th>Precio Multi</th>
+                <th>Alerta</th>
+                <th>Acción</th>
+                <th>Fecha Acción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in historico %}
+            <tr>
+                <td>{{ item.id_historico }}</td>
+                <td>{{ item.id_inventario }}</td>
+                <td>{{ item.producto }}</td>
+                <td>{{ item.cantidad }}</td>
+                <td>{{ item.precio }}</td>
+                <td>{{ item.preciomulti }}</td>
+                <td>{{ item.alerta }}</td>
+                <td>{{ item.accion }}</td>
+                <td>{{ item.fecha_accion.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

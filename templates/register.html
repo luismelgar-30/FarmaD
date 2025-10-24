@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro FarmaD</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
+</head>
+<body>
+    <div class="form-container">
+        <h1>Registro de Usuario</h1>
+        <form action="{{ url_for('register') }}" method="POST">
+            <label for="nombre">Nombre:</label><br>
+            <input type="text" id="nombre" name="nombre" required><br>
+
+            <label for="email">Email:</label><br>
+            <input type="email" id="email" name="email" required><br>
+
+            <label for="password">Contraseña:</label><br>
+            <input type="password" id="password" name="password" required><br>
+            
+            <label for="telefono">Teléfono:</label><br>
+            <input type="text" id="telefono" name="telefono"><br>
+            
+            <button type="submit">Registrar y Entrar</button>
+        </form>
+        <p>¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Inicia Sesión</a></p>
+    </div>
+</body>
+</html>

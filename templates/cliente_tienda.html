@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farmacia Melgar. - Catálogo de Productos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#0D6EFD',
+                        'secondary-green': '#198754',
+                        'accent-red': '#DC3545',
+                        'light-bg': '#f7ffec', 
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        
+        .carousel-item {
+            transition: opacity 0.5s ease-in-out;
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        .carousel-item.active {
+            opacity: 1;
+            position: relative;
+        }
+        .card-shadow {
+            transition: all 0.3s ease;
+            cursor: pointer; /* Indica que la tarjeta es interactiva (para ver detalles) */
+        }
+        .card-shadow:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15); 
+        }
+        .product-card {
+            min-height: 350px;
+        }
+    </style>
+</head>
+<body class="bg-light-bg font-sans">
+
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <a href="{{ url_for('index') }}" class="flex-shrink-0 flex items-center text-2xl font-bold text-primary-blue">
+                    Farmacia Melgar <i class="fas fa-prescription-bottle-alt text-secondary-green ml-2"></i>
+                </a>
+
+                <nav class="hidden md:flex space-x-4">
+                    <button onclick="navigate('registro')" class="text-gray-600 hover:text-primary-blue px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-user-plus mr-1"></i> Registro Cliente
+                    </button>
+                    
+                    <button onclick="navigate('stock')" class="text-gray-600 hover:text-primary-blue px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-boxes mr-1"></i> Stock (Consulta)
+                    </button>
+                    
+                    <button onclick="navigate('conocenos')" class="text-gray-600 hover:text-primary-blue px-3 py-2 rounded-md text-sm font-medium transition duration-150">
+                        <i class="fas fa-info-circle mr-1"></i> Conócenos
+                    </button>
+                    <button onclick="navigate('chatia')" class="bg-primary-blue text-white hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition duration-150 shadow-md">
+                        <i class="fas fa-robot mr-1"></i> Chat IA
+                    </button>
+                </nav>
+
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" class="text-gray-500 hover:text-primary-blue focus:outline-none">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg border-t">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <button onclick="navigate('registro')" class="block text-gray-600 hover:bg-gray-50 hover:text-primary-blue w-full text-left px-3 py-2 rounded-md text-base font-medium">Registro Cliente</button>
+                
+                <button onclick="navigate('stock')" class="block text-gray-600 hover:bg-gray-50 hover:text-primary-blue w-full text-left px-3 py-2 rounded-md text-base font-medium">Stock (Consulta)</button>
+                <button onclick="navigate('conocenos')" class="block text-gray-600 hover:bg-gray-50 hover:text-primary-blue w-full text-left px-3 py-2 rounded-md text-base font-medium">Conócenos</button>
+                <button onclick="navigate('chatia')" class="block bg-primary-blue text-white hover:bg-blue-700 w-full text-left px-3 py-2 rounded-md text-base font-medium mt-1">Chat IA</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <section class="mb-12 relative h-48 sm:h-64 md:h-80 overflow-hidden rounded-xl shadow-lg bg-gray-200" id="carousel-container">
+            <div class="carousel-item active" id="slide-1">
+                <img src="https://placehold.co/1200x400/0D6EFD/ffffff?text=OFERTA+30%25+en+Dermocosmética" alt="Oferta en Tres rosas todo noviembre" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                    <h2 class="text-white text-xl sm:text-3xl md:text-5xl font-extrabold text-center p-4"></h2>
+                </div>
+            </div>
+            <div class="carousel-item" id="slide-2">
+                <img src="https://placehold.co/1200x400/198754/ffffff?text=Recibe+Asesoría+Personalizada" alt="Descuento del 30% en el 3 producto de los rebajados" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                    <h2 class="text-white text-xl sm:text-3xl md:text-5xl font-extrabold text-center p-4"></h2>
+                </div>
+            </div>
+            <div class="carousel-item" id="slide-3">
+                <img src="https://placehold.co/1200x400/DC3545/ffffff?text=NUEVOS+PRODUCTOS" alt="Nuevos Productos" class="w-full h-full object-cover">
+                <div class="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                    <h2 class="text-white text-xl sm:text-3xl md:text-5xl font-extrabold text-center p-4"></h2>
+                </div>
+            </div>
+            <button class="absolute top-1/2 left-4 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition" onclick="changeSlide(-1)">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+            <button class="absolute top-1/2 right-4 transform -translate-y-1/2 text-white p-2 rounded-full bg-black bg-opacity-50 hover:bg-opacity-75 transition" onclick="changeSlide(1)">
+                <i class="fas fa-chevron-right"></i>
+            </button>
+        </section>
+
+        <section class="mb-12">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b-2 border-primary-blue inline-block pb-1">Medicamento Destacado (30 Productos)</h2>
+            
+            <div id="product-list" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-800 text-white p-6 mt-12">
+        <div class="max-w-7xl mx-auto text-center text-sm">
+            <p>&copy; 2025 Farmacia Melgar. Todos los derechos reservados. | <a href="#" class="hover:text-primary-blue"> Somos tu mejor opcion</a></p>
+        </div>
+    </footer>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProducts();
+            setupCarousel();
+            setupMobileMenu();
+        });
+
+        function navigate(section) {
+            
+            if (section === 'conocenos') {
+               
+                window.location.href = 'conocenos.html'; 
+                return;
+            }
+            
+            if (section === 'chatia') {
+                
+                window.location.href = 'chat_ia.html'; 
+                return;
+            }
+            if (section === 'stock') {
+                
+                window.location.href = 'stockconsulta.html'; 
+                return;
+            }
+            if (section === 'registro') {
+                
+                window.location.href = 'registro_cliente.html'; 
+                return;
+            }
+
+            if (section === 'comentarios') {
+                
+                window.location.href = 'comentario_login.html'; 
+                return;
+            }
+            
+           
+            const message = `Navegando a la sección: ${section.toUpperCase()}. 
+            (Aquí se implementaría la lógica de redirección de Flask)`;
+            console.log(message);
+            
+            showModal(message, 'Información');
+        }
+        
+        function showModal(message, title = 'Notificación') {
+            const existingModal = document.getElementById('custom-modal');
+            if (existingModal) existingModal.remove();
+
+            const modalHtml = `
+                <div id="custom-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100]">
+                    <div class="bg-white rounded-xl shadow-2xl max-w-sm w-full m-4 p-6">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 border-b pb-2">${title}</h3>
+                        <p class="text-gray-700 mb-6">${message}</p>
+                        <div class="flex justify-end">
+                            <button onclick="document.getElementById('custom-modal').remove()" class="bg-primary-blue text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-150">
+                                Aceptar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        
+        function viewProductDetails(id, name) {
+            showModal(`Has hecho clic en el producto "${name}" (ID: ${id}). 
+            (Consulta tus dudas en caja)`, 'Detalles del Producto');
+        }
+
+
+        function loadProducts() {
+            const productTemplates = [
+                { name: "Paracetamol 500mg (20 Tab)", brand: "Genérico", price: 4200, discount: 0, tag: "Medicamentos" },
+{ name: "Ibuprofeno 400mg (20 Tab)", brand: "Genérico", price: 5800, discount: 0, tag: "Medicamentos" },
+{ name: "Omeprazol 20mg (30 Cap)", brand: "Genérico", price: 7200, discount: 0, tag: "Medicamentos" },
+{ name: "Amoxicilina 500mg (21 Cap)", brand: "Amoxil", price: 14500, discount: 5, tag: "Medicamentos" },
+{ name: "Losartán 50mg (30 Tab)", brand: "Cozaar", price: 22000, discount: 10, tag: "Medicamentos" },
+{ name: "Metformina 500mg (30 Tab)", brand: "Glucophage", price: 8200, discount: 0, tag: "Medicamentos" },
+{ name: "Loratadina 10mg (10 Tab)", brand: "Claritin", price: 9800, discount: 5, tag: "Medicamentos" },
+{ name: "Azitromicina 500mg (3 Tab)", brand: "Zithromax", price: 18000, discount: 10, tag: "Medicamentos" },
+{ name: "Clonazepam 1mg (30 Tab)", brand: "Klonopin", price: 22000, discount: 0, tag: "Medicamentos" },
+{ name: "Ventolin Inhalador", brand: "GlaxoSmithKline", price: 35000, discount: 5, tag: "Medicamentos" },
+{ name: "Prednisona 20mg (30 Tab)", brand: "Genérico", price: 8900, discount: 0, tag: "Medicamentos" },
+{ name: "Suplemento Vitamina C 1g (30 Tab)", brand: "Redoxon", price: 17500, discount: 10, tag: "Vitaminas" },
+{ name: "Crema Clotrimazol 1%", brand: "Canesten", price: 11200, discount: 0, tag: "Medicamentos" },
+{ name: "Fluconazol 150mg (1 Cápsula)", brand: "Diflucan", price: 12800, discount: 0, tag: "Medicamentos" },
+{ name: "Simvastatina 20mg (30 Tab)", brand: "Zocor", price: 16500, discount: 5, tag: "Medicamentos" },
+{ name: "Multivitamínico Complejo B", brand: "Centrum", price: 29500, discount: 15, tag: "Vitaminas" },
+{ name: "Ranitidina 150mg (20 Tab)", brand: "Zantac", price: 9200, discount: 0, tag: "Medicamentos" },
+{ name: "Suero Oral (1L)", brand: "Electrolit", price: 5600, discount: 0, tag: "Hidratación" },
+{ name: "Glibenclamida 5mg (30 Tab)", brand: "Genérico", price: 7300, discount: 0, tag: "Medicamentos" },
+{ name: "Antiséptico Yodo Povidona 120ml", brand: "Isodine", price: 8800, discount: 0, tag: "Higiene" },
+{ name: "Vaselina Pura 100g", brand: "Vaseline", price: 6200, discount: 0, tag: "Higiene" },
+{ name: "Enalapril 10mg (30 Tab)", brand: "Vasotec", price: 14200, discount: 5, tag: "Medicamentos" },
+{ name: "Amlodipino 5mg (30 Tab)", brand: "Norvasc", price: 16300, discount: 5, tag: "Medicamentos" },
+{ name: "Cetirizina 10mg (10 Tab)", brand: "Zyrtec", price: 9200, discount: 0, tag: "Medicamentos" },
+{ name: "Suplemento Omega 3 (60 Cap)", brand: "Nature’s Bounty", price: 32500, discount: 10, tag: "Vitaminas" },
+{ name: "Toallitas Micelares 25 unid.", brand: "Neutrogena", price: 10500, discount: 0, tag: "Limpieza" },
+{ name: "Desodorante en Barra", brand: "Dove", price: 8900, discount: 0, tag: "Higiene" },
+{ name: "Crema para Manos 75ml", brand: "Neutrogena", price: 13400, discount: 5, tag: "Cuidado Facial" },
+{ name: "Melatonina 5mg (60 Tab)", brand: "Natrol", price: 28700, discount: 15, tag: "Vitaminas" },
+{ name: "Jabón Líquido Antibacterial 300ml", brand: "Dial", price: 7600, discount: 0, tag: "Higiene" }
+
+            ];
+
+            const productData = [];
+            
+            for (let i = 0; i < 30; i++) {
+                const template = productTemplates[i % productTemplates.length];
+                productData.push({
+                    id: i + 1,
+                    name: `${template.name} (${i + 1})`,
+                    brand: template.brand,
+                    price: template.price + (i * 100), 
+                    discount: i % 7 === 0 ? 35 : template.discount,
+                    image: `https://placehold.co/300x300/f0f0f0/333333?text=${template.tag}+${i+1}`,
+                });
+            }
+
+
+            const listContainer = document.getElementById('product-list');
+            
+            productData.forEach(product => {
+                const finalPrice = product.price * (1 - (product.discount / 100));
+                
+                const html = `
+                    <div onclick="viewProductDetails(${product.id}, '${product.name}')" class="bg-white rounded-xl overflow-hidden card-shadow p-4 flex flex-col items-center text-center product-card">
+                        <div class="relative w-full h-40 mb-3">
+                            <img src="${product.image}" onerror="this.onerror=null;this.src='https://placehold.co/300x300/cccccc/333333?text=Producto';" alt="${product.name}" class="w-full h-full object-contain">
+                            ${product.discount > 0 ? `<span class="absolute top-2 left-2 bg-accent-red text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">-${product.discount}%</span>` : ''}
+                            <button class="absolute top-2 right-2 text-gray-400 hover:text-accent-red transition"><i class="far fa-heart text-lg"></i></button>
+                        </div>
+                        <p class="text-sm font-semibold text-gray-700 h-10 overflow-hidden mt-auto" title="${product.name}">${product.name}</p>
+                        <p class="text-xs text-gray-500 mb-3">${product.brand}</p>
+                        
+                        <div class="mt-auto">
+                            ${product.discount > 0 ? `<p class="text-xs text-gray-400 line-through">\L${product.price.toLocaleString('es-ES')}</p>` : ''}
+                            <p class="text-xl font-extrabold text-gray-900 mb-1">\L${finalPrice.toFixed(0).toLocaleString('es-ES')}</p>
+                        </div>
+                    </div>
+                `;
+                listContainer.insertAdjacentHTML('beforeend', html);
+            });
+        }
+        
+        
+        let currentSlide = 0;
+        const slides = document.getElementsByClassName('carousel-item');
+        const totalSlides = slides.length;
+
+        function setupCarousel() {
+            
+            for (let i = 0; i < totalSlides; i++) {
+                slides[i].classList.remove('active');
+            }
+            if (totalSlides > 0) {
+                slides[0].classList.add('active');
+                setInterval(() => changeSlide(1), 5000);
+            }
+        }
+
+        function changeSlide(direction) {
+            slides[currentSlide].classList.remove('active');
+            currentSlide = (currentSlide + direction + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+        }
+
+        function setupMobileMenu() {
+            const button = document.getElementById('mobile-menu-button');
+            const menu = document.getElementById('mobile-menu');
+            button.addEventListener('click', () => {
+                menu.classList.toggle('hidden');
+            });
+        }
+    </script>
+</body>
+</html>

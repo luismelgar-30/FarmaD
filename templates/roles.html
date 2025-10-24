@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Roles</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='roles.css') }}">
+</head>
+<body>
+    <h1>Gestión de Roles</h1>
+    
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="{{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    
+    <form action="{{ url_for('roles_bp.add_role') }}" method="POST">
+        
+        <label for="rol">Rol:</label>
+        <select name="rol" id="rol" required>
+            <option value="">Selecciona un rol</option>
+            <option value="administrador">Administrador</option>
+            <option value="vendedor">Vendedor</option>
+        </select>
+
+        <label for="usuario">Usuario:</label>
+        <select name="usuario" id="usuario" required>
+            <option value="">Selecciona un usuario</option>
+            {% for u in usuarios %}
+                <option value="{{ u.email }}">{{ u.email }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Agregar Rol</button>
+        <a href="{{ url_for('home') }}" class="btn btn-back">Regresar al Menú</a> 
+    </form>
+
+    
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Rol</th>
+                <th>Usuario</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for r in roles %}
+            <tr>
+                <td>{{ r.id_rol }}</td>
+                <td>{{ r.rol }}</td>
+                <td>{{ r.email }}</td>
+                <td>
+                    <a href="{{ url_for('roles_bp.edit_role', id_rol=r.id_rol) }}">Editar</a>
+                    <a href="{{ url_for('roles_bp.delete_role', id_rol=r.id_rol) }}" onclick="return confirm('¿Eliminar este rol?');">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if edit_role %}
+    
+    <h2>Editar Rol</h2>
+    <form action="{{ url_for('roles_bp.edit_role', id_rol=edit_role.id_rol) }}" method="POST">
+        <label for="rol_edit">Rol:</label>
+        <select name="rol" id="rol_edit" required>
+            <option value="administrador" {% if edit_role.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+            <option value="vendedor" {% if edit_role.rol == 'vendedor' %}selected{% endif %}>Vendedor</option>
+        </select>
+
+        <label for="usuario_edit">Usuario:</label>
+        <select name="usuario" id="usuario_edit" required>
+            {% for u in usuarios %}
+                <option value="{{ u.email }}" {% if edit_role.usuario == u.email %}selected{% endif %}>{{ u.email }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit">Guardar Cambios</button>
+    </form>
+    {% endif %}
+
+</body>
+</html>

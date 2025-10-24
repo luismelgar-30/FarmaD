@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Cliente - Farmacia Melgar</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6; 
+        }
+        input:disabled {
+            background-color: #e5e7eb;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-2xl border-t-4 border-[#10B981]">
+     
+        <header class="mb-6 text-center">
+            <h1 class="text-3xl font-extrabold text-gray-800">
+                <span class="text-[#10B981]">Farmacia Melgar</span>
+                Registro de Cliente
+            </h1>
+            <p class="text-gray-500 mt-2">Crea tu perfil.</p>
+        </header>
+
+        <form id="registrationForm" class="space-y-4">
+            
+            <div>
+                <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre Completo</label>
+                <input type="text" id="nombre" name="nombre" required 
+                       class="mt-1 block w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:border-[#059669] focus:ring focus:ring-[#10B981] focus:ring-opacity-50 transition duration-150">
+            </div>
+
+            <div>
+                <label for="correo" class="block text-sm font-medium text-gray-700">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo" required 
+                       class="mt-1 block w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:border-[#059669] focus:ring focus:ring-[#10B981] focus:ring-opacity-50 transition duration-150">
+            </div>
+
+            <div>
+                <label for="identidad" class="block text-sm font-medium text-gray-700">Identidad / Cédula</label>
+                <input type="text" id="identidad" name="identidad" required 
+                       class="mt-1 block w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:border-[#059669] focus:ring focus:ring-[#10B981] focus:ring-opacity-50 transition duration-150">
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" required 
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:border-[#059669] focus:ring focus:ring-[#10B981] focus:ring-opacity-50 transition duration-150">
+                </div>
+                <div>
+                    <label for="edad" class="block text-sm font-medium text-gray-700">Edad</label>
+                    <input type="number" id="edad" name="edad" required min="18" max="120"
+                           class="mt-1 block w-full p-3 border border-gray-300 rounded-xl shadow-sm focus:border-[#059669] focus:ring focus:ring-[#10B981] focus:ring-opacity-50 transition duration-150">
+                </div>
+            </div>
+
+            <div id="messageContainer" class="hidden p-3 rounded-lg text-sm font-medium transition duration-300"></div>
+
+            <button type="submit" id="registerButton"
+                    class="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-white bg-[#059669] hover:bg-[#10B981] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#059669] transition duration-150">
+                Registrar Cliente
+            </button>
+            
+            <button type="button" id="backButton"
+                    class="hidden w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-lg font-bold text-gray-800 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition duration-150"
+                    onclick="window.location.href = 'http://127.0.0.1:5000/cliente';">
+                Regresar
+            </button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('registrationForm');
+        const messageContainer = document.getElementById('messageContainer');
+        const registerButton = document.getElementById('registerButton');
+        const backButton = document.getElementById('backButton');
+        const inputFields = form.querySelectorAll('input');
+
+        function showMessage(text, isError = false) {
+            messageContainer.textContent = text;
+            messageContainer.classList.remove('hidden', 'bg-red-100', 'text-red-700', 'bg-green-100', 'text-green-700');
+            if (isError) {
+                messageContainer.classList.add('bg-red-100', 'text-red-700');
+            } else {
+                messageContainer.classList.add('bg-green-100', 'text-green-700');
+            }
+            registerButton.disabled = false; 
+            registerButton.innerHTML = "Registrar Cliente";
+        }
+
+        function setFieldsDisabled(disabled) {
+            inputFields.forEach(input => input.disabled = disabled);
+        }
+
+        
+        function validarCampos(data) {
+            
+            const nombreRegex = /^[A-Za-zÁÉÍÓÚáéíóúÑñ]+(?: [A-Za-zÁÉÍÓÚáéíóúÑñ]+)*$/;
+            if (!nombreRegex.test(data.nombre)) {
+                return "El nombre solo puede contener letras y un solo espacio entre palabras.";
+            }
+            if (data.nombre.length < 3 || data.nombre.length > 15) {
+                return "El nombre debe tener entre 3 y 15 letras.";
+            }
+            if (/\s{2,}/.test(data.nombre)) {
+                return "El nombre no debe contener dos espacios seguidos.";
+            }
+
+            // Correo electrónico
+            if (/\s/.test(data.correo)) {
+                return "El correo no debe contener espacios.";
+            }
+            if ((data.correo.match(/@/g) || []).length !== 1) {
+                return "El correo debe contener exactamente un '@'.";
+            }
+            if (data.correo.length > 25) {
+                return "El correo no debe tener más de 15 caracteres.";
+            }
+
+            
+            if (!/^\d{13}$/.test(data.identidad)) {
+                return "La identidad debe contener exactamente 13 números sin signos ni letras.";
+            }
+
+           
+            if (!/^\d{8}$/.test(data.telefono)) {
+                return "El teléfono debe tener exactamente 8 números sin signos.";
+            }
+
+            
+            const edadNum = Number(data.edad);
+            if (isNaN(edadNum) || edadNum < 18 || edadNum > 95) {
+                return "La edad debe ser un número entre 18 y 95.";
+            }
+
+            return null; 
+        }
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const data = {
+                nombre: document.getElementById('nombre').value.trim(),
+                correo: document.getElementById('correo').value.trim(),
+                telefono: document.getElementById('telefono').value.trim(),
+                identidad: document.getElementById('identidad').value.trim(),
+                edad: document.getElementById('edad').value.trim(),
+            };
+
+          
+            const errorMsg = validarCampos(data);
+            if (errorMsg) {
+                showMessage(errorMsg, true);
+                return;
+            }
+
+            registerButton.disabled = true;
+            registerButton.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Registrando...
+            `;
+            messageContainer.classList.add('hidden'); 
+
+            try {
+                const response = await fetch('/cliente/api/registro', { 
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showMessage("¡Registro exitoso! Cliente guardado en el sistema.", false);
+                    setFieldsDisabled(true);
+                    registerButton.classList.add('hidden');
+                    backButton.classList.remove('hidden'); 
+                } else {
+                    showMessage(`Error: ${result.message || 'Error desconocido en el registro.'}`, true);
+                }
+
+            } catch (error) {
+                console.error("Error de red/servidor:", error);
+                showMessage("Error de conexión con el servidor. Intente más tarde.", true);
+            }
+        });
+    </script>
+</body>
+</html>

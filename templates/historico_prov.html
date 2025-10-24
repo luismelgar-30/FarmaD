@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Histórico de Pedidos a Proveedores</title>
+    <link rel="stylesheet" href="{{ url_for('historico_prov.static', filename='historico_prov.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('home') }}" class="btn btn-back">Regresar al Menú</a> 
+        <h1>Histórico de Pedidos a Proveedores</h1>
+
+        <form id="form-filtro" method="POST" class="filtro-fecha">
+            <label for="fecha_inicio">Fecha inicio:</label>
+            <input type="date" id="fecha_inicio" name="fecha_inicio">
+            <label for="fecha_fin">Fecha fin:</label>
+            <input type="date" id="fecha_fin" name="fecha_fin">
+            <button type="submit">Filtrar</button>
+        </form>
+
+        <div class="table-container">
+            <table id="historico-table">
+                <thead>
+                    <tr>
+                        <th>ID Hist.</th>
+                        <th>ID Pedido</th>
+                        <th>Proveedor</th>
+                        <th>Producto</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Suma Total</th>
+                        <th>Fecha Pedido</th>
+                        <th>Estipulado</th>
+                        <th>Alerta</th>
+                        <th>Acción</th>
+                        <th>Fecha Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in historico %}
+                    <tr>
+                        <td>{{ item.id_historico }}</td>
+                        <td>{{ item.id_pedido_prov }}</td>
+                        <td>{{ item.proveedor }}</td>
+                        <td>{{ item.producto }}</td>
+                        <td>{{ item.precio }}</td>
+                        <td>{{ item.cantidad }}</td>
+                        <td>{{ item.suma_total }}</td>
+                        <td>{{ item.fecha.strftime('%Y-%m-%d') if item.fecha else '' }}</td>
+                        <td>{{ item.estipulado }}</td>
+                        <td>{{ item.alerta }}</td>
+                        <td>{{ item.accion }}</td>
+                        <td>{{ item.fecha_accion.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="pagination" id="pagination"></div>
+    </div>
+
+    <script>
+        
+        const rowsPerPage = 10;
+        const table = document.getElementById('historico-table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        const pagination = document.getElementById('pagination');
+        let currentPage = 1;
+
+        function displayPage(page) {
+            const start = (page - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.forEach((row, index) => {
+                row.style.display = (index >= start && index < end) ? '' : 'none';
+            });
+        }
+
+        function setupPagination() {
+            const pageCount = Math.ceil(rows.length / rowsPerPage);
+            pagination.innerHTML = '';
+            for (let i = 1; i <= pageCount; i++) {
+                const btn = document.createElement('button');
+                btn.innerText = i;
+                btn.classList.add('page-btn');
+                if (i === currentPage) btn.classList.add('active');
+                btn.addEventListener('click', () => {
+                    currentPage = i;
+                    displayPage(currentPage);
+                    document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                });
+                pagination.appendChild(btn);
+            }
+        }
+
+        displayPage(currentPage);
+        setupPagination();
+    </script>
+</body>
+</html>

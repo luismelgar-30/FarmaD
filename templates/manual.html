@@ -1,0 +1,35 @@
+{% extends "base_admin.html" %}
+
+{% block page_title %}Manual{% endblock %}
+{% block title %}Manual de Usuario{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='manual.css') }}">
+
+<div class="manual-container">
+    <h2>Manual de Usuario - Farmacia Melgar</h2>
+
+    {% set pasos = [
+        'Aqui eliges que funciones necesitas iniciar, cada una con caracteristicas distintas',
+        'Inicia con tu usuario, si no tienes registrate, contraseñas encriptadas',
+        'Navegación por el panel de administacion, en el sus diversas secciones.',
+        'Las ventanas de uso, cuentan con un CRUD, se basan en un mismo diseño',
+        'En roles, tu das permisos a tus usuarios, si vendedor o administrador',
+        'Cuando tienes rol vendedor, no veras las pantallas administrativas solo las de produccion',
+        'En configuracion puedes adaptar diferentes colores al diseño de la pagina',
+        'Si en el inicio accedes a clientes, veras esta interfaz, donde se muestran los productos y caracteristicas utiles para el cliente',
+        'En stock, puedes ver y filtrar rapidamente que producto hay disponibles en tiempo real',
+        'En registro cliente, el mismo se puede registrar para promociones'
+    ] %}
+
+    {% for i in range(1, 11) %}
+    <section class="manual-section">
+        <h3>Paso {{ i }}</h3>
+        <p>{{ pasos[i - 1] }}</p>
+        <div class="manual-image">
+            <img src="{{ url_for('static', filename='manual/img' ~ i ~ '.png') }}" alt="Imagen Paso {{ i }}">
+        </div>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

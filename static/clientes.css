@@ -1,0 +1,90 @@
+.container-crud {
+    width: 100%;
+    margin: 20px auto;
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.container-crud h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.form-crud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 25px;
+}
+
+.form-crud input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    width: 180px;
+}
+
+.btn-agregar {
+    background: #198754;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.btn-agregar:hover {
+    background: #157347;
+}
+
+.tabla-crud {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabla-crud th, .tabla-crud td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.tabla-crud th {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-editar, .btn-eliminar {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-editar {
+    background-color: #ffc107;
+    color: black;
+}
+
+.btn-eliminar {
+    background-color: #dc3545;
+    color: white;
+    text-decoration: none;
+}
+
+.btn-editar:hover { background-color: #e0a800; }
+.btn-eliminar:hover { background-color: #bb2d3b; }
+
+.btn-back {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
