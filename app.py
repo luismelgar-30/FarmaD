@@ -1,5 +1,5 @@
 import pyodbc
-from werkzeug.security import generate_password_hash, check_password_hash  # 🔒 Agregado para encriptar y verificar contraseñas
+from werkzeug.security import generate_password_hash, check_password_hash  # librriaAgregado para encriptar
 
 from flask import Flask, request, render_template, redirect, url_for, session, flash
 
@@ -63,7 +63,7 @@ def register():
         email = request.form['email']
         password = request.form['password'] 
         telefono = request.form.get('telefono', None) 
-
+#S 31:14, S 28:06
         
         password_hash = generate_password_hash(password)
         
@@ -85,7 +85,7 @@ def register():
                 session['email'] = email
                 session['nombre'] = nombre
                 session['rol'] = 'administrador'
-                
+                #Bendice el proyecto Dios
                 return redirect(url_for('home')) 
             except pyodbc.IntegrityError:
                 flash("Error: El email ya está registrado.", 'error')
