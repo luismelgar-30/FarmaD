@@ -1,0 +1,350 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<style>
+    :root {
+        --primary-blue: #007bff;
+        --success-green: #28a745;
+        --dark-grey: #343a40;
+        --light-bg: #f8f9fa;
+    }
+
+    .main-container {
+        background-color: #f4f7f6;
+        padding: 30px;
+        border-radius: 15px;
+    }
+
+    .card {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        margin-bottom: 25px;
+    }
+
+    .card-header {
+        border-radius: 12px 12px 0 0 !important;
+        font-weight: bold;
+        text-transform: uppercase;
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+
+    .bg-header-cai { background-color: var(--primary-blue); color: white; }
+    .bg-header-prod { background-color: var(--success-green); color: white; }
+
+    .form-label {
+        font-weight: 600;
+        color: #555;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .table thead th {
+        background-color: var(--dark-grey);
+        color: white;
+        border: none;
+        text-transform: uppercase;
+        font-size: 0.85rem;
+    }
+
+    .total-card {
+        background: var(--dark-grey);
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+    }
+
+    .total-amount {
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: #2ecc71;
+    }
+
+    .btn-add {
+        background-color: var(--primary-blue);
+        color: white;
+        font-weight: bold;
+        transition: all 0.3s;
+    }
+
+    .btn-add:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,123,255,0.3);
+    }
+
+    .btn-print {
+        font-size: 1.2rem;
+        padding: 15px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .delete-row {
+        color: #dc3545;
+        cursor: pointer;
+        font-size: 1.2rem;
+    }
+
+    .info-cai-box {
+        background: #e9ecef;
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 4px solid var(--primary-blue);
+    }
+
+    .btn-bback {
+        background-color: #3b82f6;
+        color: white;
+        padding: 10px 16px;
+        border-radius: 16px;
+        font-weight: 600;
+        text-decoration: none;
+        margin-bottom: 20px;
+        display: inline-block;
+        transition: background-color 0.3s ease;
+    }
+</style>
+
+<div class="container-fluid main-container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="text-dark font-weight-bold m-0">Módulo de Facturación</h2>
+        <a href="{{ url_for('home') }}" class="btn-bback">Regresar al Menú</a>
+    </div>
+    
+    <form method="POST" id="form-factura" target="_blank">
+        <div class="row">
+            
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-header-cai">
+                        <i class="fas fa-file-invoice mr-2"></i> Información Legal (CAI)
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label text-muted small">Fecha de Emisión</label>
+                            <input type="text" id="fecha_actual" class="form-control font-weight-bold" style="background-color: #fff9e6;" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Seleccionar CAI Vigente</label>
+                            <select name="cai_selector" id="cai_selector" class="form-control shadow-sm" required>
+                                <option value="">-- Seleccione un CAI --</option>
+                                {% for c in cais %}
+                                <option value="{{ c.id_cai }}">{{ c.cai_numero }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Número de Factura Correlativo</label>
+                            <input type="text" name="numero_factura" id="numero_factura" class="form-control form-control-lg font-weight-bold text-primary" readonly placeholder="Seleccione CAI...">
+                        </div>
+                        <div class="info-cai-box mt-3">
+                            <div class="row text-center">
+                                <div class="col-6">
+                                    <small class="text-muted uppercase">RTN:</small><br>
+                                    <span id="rtn_text" class="font-weight-bold">-</span>
+                                </div>
+                                <div class="col-6">
+                                    <small class="text-muted">FECHA LÍMITE:</small><br>
+                                    <span id="fecha_f_text" class="font-weight-bold">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header bg-header-prod">
+                        <i class="fas fa-cart-plus mr-2"></i> Selección de Productos
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Buscar Producto</label>
+                            <select id="prod_selector" class="form-control select2">
+                                <option value="">-- Escriba el nombre --</option>
+                                {% for p in productos %}
+                                <option value="{{ p.producto }}" data-precio="{{ p.precio }}" data-stock="{{ p.cantidad }}">
+                                    {{ p.producto }} (Disp: {{ p.cantidad }})
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Cantidad</label>
+                                <input type="number" id="cant_input" class="form-control" min="1" placeholder="0">
+                            </div>
+                            <div class="col-6">
+                                <label class="form-label">&nbsp;</label>
+                                <button type="button" onclick="agregarAlCarrito()" class="btn btn-add btn-block">
+                                    AÑADIR A LISTA
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7">
+                <div class="card shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="p-3 bg-light border-bottom">
+                            <h5 class="m-0 font-weight-bold text-dark">Detalle de Venta</h5>
+                        </div>
+                        <div style="min-height: 400px; padding: 15px;">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Descripción</th>
+                                        <th class="text-center">Cant.</th>
+                                        <th class="text-right">Precio</th>
+                                        <th class="text-right">Subtotal</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla_detalles">
+                                    </tbody>
+                            </table>
+                        </div>
+
+                        <div class="total-card m-3">
+                            <div class="d-flex justify-content-between">
+                                <span>Subtotal Gravado:</span>
+                                <span>L. <span id="sub_view">0.00</span></span>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>ISV (25%):</span>
+                                <span>L. <span id="isv_view">0.00</span></span>
+                            </div>
+                            <hr style="border-top: 1px solid rgba(255,255,255,0.1);">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h4 m-0">TOTAL A PAGAR:</span>
+                                <span class="total-amount">L. <span id="total_view">0.00</span></span>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="productos_data" id="productos_data">
+                        <input type="hidden" name="subtotal_hidden" id="subtotal_hidden">
+                        <input type="hidden" name="impuesto_hidden" id="impuesto_hidden">
+                        <input type="hidden" name="total_final_hidden" id="total_final_hidden">
+
+                        <div class="p-3">
+                            <button type="submit" class="btn btn-success btn-lg btn-block btn-print shadow" id="btn-generar" disabled>
+                                <i class="fas fa-print mr-2"></i> GUARDAR Y GENERAR FACTURA
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    let carrito = [];
+
+   
+    function actualizarFecha() {
+        const ahora = new Date();
+        const opciones = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        document.getElementById('fecha_actual').value = ahora.toLocaleDateString('es-HN', opciones);
+    }
+    
+    
+    actualizarFecha();
+
+    
+    document.getElementById('cai_selector').addEventListener('change', async (e) => {
+        const id = e.target.value;
+        if(!id) return;
+        try {
+            const res = await fetch(`/facturacion/get_cai_data/${id}`);
+            const data = await res.json();
+       
+            document.getElementById('numero_factura').value = `000-001-01-${data.proximo}`;
+            document.getElementById('rtn_text').innerText = data.rtn;
+            document.getElementById('fecha_f_text').innerText = data.fecha_f;
+            renderizarTabla(); 
+        } catch (e) { console.error("Error CAI", e); }
+    });
+
+    
+    function agregarAlCarrito() {
+        const sel = document.getElementById('prod_selector');
+        const opt = sel.options[sel.selectedIndex];
+        const cant = parseInt(document.getElementById('cant_input').value);
+        
+        if(!opt.value || isNaN(cant) || cant <= 0) return alert("Seleccione producto y cantidad");
+        if(cant > parseInt(opt.dataset.stock)) return alert("Stock insuficiente en inventario");
+
+        const item = {
+            nombre: opt.value,
+            precio: parseFloat(opt.dataset.precio),
+            cantidad: cant,
+            total: cant * parseFloat(opt.dataset.precio)
+        };
+
+        carrito.push(item);
+        renderizarTabla();
+        document.getElementById('cant_input').value = "";
+        sel.value = "";
+    }
+
+    
+    function renderizarTabla() {
+        const tbody = document.getElementById('tabla_detalles');
+        tbody.innerHTML = "";
+        let subtotal = 0;
+
+        carrito.forEach((item, index) => {
+            subtotal += item.total;
+            tbody.innerHTML += `
+                <tr>
+                    <td class="align-middle">${item.nombre}</td>
+                    <td class="text-center align-middle">${item.cantidad}</td>
+                    <td class="text-right align-middle">L. ${item.precio.toFixed(2)}</td>
+                    <td class="text-right align-middle font-weight-bold">L. ${item.total.toFixed(2)}</td>
+                    <td class="text-center align-middle">
+                        <i class="fas fa-times-circle delete-row" onclick="eliminar(${index})"></i>
+                    </td>
+                </tr>`;
+        });
+
+        const isv = subtotal * 0.25; 
+        const total = subtotal + isv;
+
+        document.getElementById('sub_view').innerText = subtotal.toLocaleString('es-HN', {minimumFractionDigits: 2});
+        document.getElementById('isv_view').innerText = isv.toLocaleString('es-HN', {minimumFractionDigits: 2});
+        document.getElementById('total_view').innerText = total.toLocaleString('es-HN', {minimumFractionDigits: 2});
+
+        document.getElementById('productos_data').value = JSON.stringify(carrito);
+        document.getElementById('subtotal_hidden').value = subtotal;
+        document.getElementById('impuesto_hidden').value = isv;
+        document.getElementById('total_final_hidden').value = total;
+
+        
+        document.getElementById('btn-generar').disabled = (carrito.length === 0 || !document.getElementById('cai_selector').value);
+    }
+
+    function eliminar(index) {
+        carrito.splice(index, 1);
+        renderizarTabla();
+    }
+
+  
+    document.getElementById('form-factura').onsubmit = function() {
+        setTimeout(() => {
+            carrito = [];
+            document.getElementById('form-factura').reset();
+            document.getElementById('rtn_text').innerText = "-";
+            document.getElementById('fecha_f_text').innerText = "-";
+            actualizarFecha(); 
+            renderizarTabla();
+            alert("Factura generada con éxito.");
+        }, 1500);
+        return true;
+    };
+</script>
+{% endblock %}

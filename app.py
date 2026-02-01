@@ -1,13 +1,13 @@
 import pyodbc
-from werkzeug.security import generate_password_hash, check_password_hash  # librriaAgregado para encriptar
+from werkzeug.security import generate_password_hash, check_password_hash  # librria para encriptar
 
 from flask import Flask, request, render_template, redirect, url_for, session, flash
-
+from facturas_crud import facturas_bp
 from productos_crud import productos 
 from proveedores_crud import proveedores 
 from inventario_crud import inventario_bp
 from pedidos_prov_crud import pedidos_prov
-
+from cai_crud import cai_bp
 from stockconsulta  import stock_bp 
 from cliente  import cliente_bp 
 
@@ -165,6 +165,7 @@ def chat_ia():
 def proveedores_inicio():
     return redirect(url_for('proveedores.proveedores_home'))
 
+
 @app.route('/inventario_inicio')
 def inventario_inicio():
     return redirect(url_for('stock.show_inventory_page')) 
@@ -184,6 +185,7 @@ def conocenos():
 @app.route('/stockconsulta.html')
 def stockconsulta():
     return render_template('stockconsulta.html')
+
 
 @app.route('/registro_cliente.html')
 def clientes():
@@ -212,6 +214,9 @@ app.register_blueprint(usuarios_bp)
 
 from clientes_crud import clientes
 app.register_blueprint(clientes)
+
+app.register_blueprint(cai_bp, url_prefix='/cai')
+app.register_blueprint(facturas_bp, url_prefix='/facturacion')
 
 if __name__ == '__main__':
     app.run(debug=True)

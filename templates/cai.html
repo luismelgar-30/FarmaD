@@ -1,0 +1,136 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='style_cai.css') }}">
+
+<div class="container-fluid">
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <a href="{{ url_for('home') }}" class="btn-bback">Regresar al Menú</a>
+            <h6 class="m-0 font-weight-bold text-primary">Gestión de CAI</h6>
+        
+        </div>
+        
+        <div class="card-body">
+             
+            <form method="POST" action="{{ url_for('cai.cai_home') }}">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label>Comentario</label>
+                        <input type="text" name="usuario" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>RTN</label>
+                        <input type="text" id="rtn" name="rtn" class="form-control" placeholder="XXXX-XXXX-XXXXXX" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label>Estado</label>
+                        <select name="estado" class="form-control">
+                            <option value="Activo">Activo</option>
+                            <option value="Inactivo">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Fecha Inicio</label>
+                        <input type="date" name="fecha_inicio" class="form-control" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Fecha Final</label>
+                        <input type="date" name="fecha_final" class="form-control" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label>Número de CAI</label>
+                    <input type="text" id="cai_numero" name="cai_numero" class="form-control" placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX" required style="text-transform: uppercase;">
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label>Rango Inicio</label>
+                        <input type="text" id="rango_i" name="rango_inicio" class="form-control" placeholder="XXX-XXX-XX-XXXXXXXX" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label>Rango Final</label>
+                        <input type="text" id="rango_f" name="rango_final" class="form-control" placeholder="XXX-XXX-XX-XXXXXXXX" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Guardar Registro CAI</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Registros Creados</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>RTN</th>
+                            <th>CAI</th>
+                            <th>Rangos</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for r in registros %}
+                        <tr>
+                            <td>{{ r.id_cai }}</td>
+                            <td>{{ r.rtn }}</td>
+                            <td style="font-size: 0.8rem;">{{ r.cai_numero }}</td>
+                            <td>{{ r.rango_inicio }} <br> {{ r.rango_final }}</td>
+                            <td>
+                                <span class="badge {{ 'badge-success' if r.estado == 'Activo' else 'badge-danger' }}">
+                                    {{ r.estado }}
+                                </span>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('cai.eliminar_cai', id_cai=r.id_cai) }}" method="POST" style="display:inline;">
+                                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Eliminar este registro?')">Eliminar</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function setupMask(id, pattern) {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (id === 'cai_numero') val = e.target.value.replace(/[^0-9a-fA-F]/g, ""); // CAI puede tener letras
+            
+            let formatted = "";
+            let charPos = 0;
+            for (let i = 0; i < pattern.length && charPos < val.length; i++) {
+                if (pattern[i] === "X") {
+                    formatted += val[charPos++];
+                } else {
+                    formatted += pattern[i];
+                }
+            }
+            e.target.value = formatted.toUpperCase();
+        });
+    }
+
+    setupMask('rtn', 'XXXX-XXXX-XXXXXX');
+    setupMask('cai_numero', 'XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX');
+    setupMask('rango_i', 'XXX-XXX-XX-XXXXXXXX');
+    setupMask('rango_f', 'XXX-XXX-XX-XXXXXXXX');
+</script>
+{% endblock %}

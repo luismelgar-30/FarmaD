@@ -3,11 +3,8 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 
 clientes = Blueprint('clientes', __name__, url_prefix='/clientes')
 
-
 def get_db_connection():
     return pyodbc.connect(current_app.config['CONNECTION_STRING'])
-
-
 
 @clientes.route('/')
 def listar_clientes():

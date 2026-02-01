@@ -8,13 +8,19 @@
 
     
     {% if user_rol == 'administrador' %}
+        
         <a href="{{ url_for('productos.listar_productos') }}" class="option-card">Productos</a>
         <a href="{{ url_for('inventario.inventario_home') }}" class="option-card">Inventario</a>
         <a href="{{ url_for('proveedores.proveedores_home') }}" class="option-card">Proveedores</a>
+    
+    <a href="{{ url_for('facturas.historial_facturas') }}" class="option-card">
+    <i class="fas fa-history mr-2"></i> Histórico de Facturas
     {% endif %}
+</a>
 
     
     <a href="{{ url_for('pedidos_prov.listar_pedidos') }}" class="option-card">Pedidos Proveedor</a>
+    <a href="{{ url_for('clientes.listar_clientes') }}" class="option-card">Clientes</a>
     <a href="{{ url_for('historico_prov.historico_prov') }}" class="option-card">Históricos de Proveedores</a>
     <a href="{{ url_for('historico_inventario.historico_inventario') }}" class="option-card">Histórico de Inventario</a>
     <a href="{{ url_for('stockconsulta') }}" class="option-card">
@@ -24,7 +30,7 @@
     
     {% if user_rol == 'administrador' %}
         <a href="{{ url_for('usuarios.usuarios_home') }}" class="option-card">Usuarios</a>
-        <a href="{{ url_for('clientes.listar_clientes') }}" class="option-card">Clientes</a>
+        
 
     {% endif %}
 </div>

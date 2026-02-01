@@ -1,0 +1,195 @@
+{% extends "base_admin.html" %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+        --primary-blue: #0066cc;
+        --dark-bg: #1a1d20;
+        --light-gray: #f8f9fa;
+    }
+
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f4f7f6;
+    }
+
+    .main-container {
+        padding: 20px;
+    }
+
+    .header-section {
+        background: gray;
+        padding: 16px;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+    }
+
+    
+
+    .custom-table {
+        background: white;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        border: none;
+    }
+
+    .custom-table thead {
+        background: var(--dark-bg);
+        color: white;
+    }
+
+    .custom-table thead th {
+        font-weight: 800;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+        padding: 18px;
+        border: none;
+    }
+
+    .custom-table tbody td {
+        padding: 18px;
+        vertical-align: middle;
+        color: #4a5568;
+        border-top: 1px solid #edf2f7;
+    }
+
+    .badge-number {
+        background: #ebf4ff;
+        color: #2b6cb0;
+        font-weight: 700;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #bee3f8;
+    }
+
+    .amount-text {
+        font-family: 'Courier New', Courier, monospace;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #2d3748;
+    }
+
+    .btn-pdf {
+        background-color: #fff5f5;
+        color: #c53030;
+        border: 1px solid #feb2b2;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+
+    .btn-pdf:hover {
+        background-color: #c53030;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .filter-card {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        padding: 15px;
+        border-radius: 12px;
+    }
+        .btn-bback {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
+</style>
+<a href="{{ url_for('home') }}" class="btn-bback">Regresar al Menú</a>
+<div class="main-container">
+    <div class="header-section d-md-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center">
+            <div class="title-icon">
+                <i class="fas fa-file-invoice fa-lg"></i>
+            </div>
+            <div>
+                <h2 class="mb-0 font-weight-bold" style="color: #2d3748;">Historial de Facturación</h2>
+                <p class="text-muted mb-0 small">Consulta y reimpresión de documentos emitidos</p>
+            </div>
+        </div>
+
+        <div class="filter-card mt-3 mt-md-0">
+            <form class="form-inline" method="GET">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text bg-white border-right-0"><i class="far fa-calendar-alt text-muted"></i></span>
+                    </div>
+                    <input type="date" name="fecha" class="form-control border-left-0" value="{{ fecha_sel or '' }}">
+                    <div class="input-group-append">
+                        <button type="submit" class="btn btn-primary px-4 font-weight-bold">Filtrar</button>
+                    </div>
+                </div>
+                {% if fecha_sel %}
+                <a href="{{ url_for('facturas.historial_facturas') }}" class="btn btn-link text-danger btn-sm ml-2 text-decoration-none">
+                    <i class="fas fa-times-circle"></i> Limpiar
+                </a>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table custom-table">
+            <thead>
+                <tr>
+                    <th>Fecha de Emisión</th>
+                    <th>Número de Factura</th>
+                    <th>CAI Relacionado</th>
+                    <th class="text-right">Monto Total</th>
+                    <th class="text-center">Documento</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for f in facturas %}
+                <tr>
+                    <td>
+                        <div class="d-flex flex-column">
+                            <span class="font-weight-bold text-dark">{{ f[2].strftime('%d/%m/%Y') if f[2] else 'N/A' }}</span>
+                            <span class="small text-muted">{{ f[2].strftime('%I:%M %p') if f[2] else '' }}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="badge-number">{{ f[1] }}</span>
+                    </td>
+                    <td>
+                        <div class="text-muted small" style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                            {{ f[4] }}
+                        </div>
+                    </td>
+                    <td class="text-right">
+                        <span class="amount-text text-success">L. {{ "{:,.2f}".format(f[3]) }}</span>
+                    </td>
+                    <td class="text-center">
+                        <a href="{{ url_for('facturas.reimprimir_factura', id_factura=f[0]) }}" 
+                           target="_blank" 
+                           class="btn btn-pdf btn-sm px-3 rounded-pill">
+                            <i class="fas fa-file-pdf mr-1"></i> Reimprimir
+                        </a>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center py-5">
+                        <div class="py-4">
+                            <i class="fas fa-search fa-3x text-light mb-3"></i>
+                            <h4 class="text-muted">No se encontraron facturas</h4>
+                            <p class="text-muted">Intenta cambiar el rango de fecha o registra una nueva venta.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

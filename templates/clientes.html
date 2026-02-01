@@ -29,7 +29,7 @@
                 <th>Teléfono</th>
                 <th>Identidad</th>
                 <th>Edad</th>
-                <th>Fecha Registro</th>
+                
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -43,7 +43,7 @@
                     <td><input type="text" name="telefono" value="{{ c[3] }}" required></td>
                     <td><input type="text" name="identidad" value="{{ c[4] }}" required></td>
                     <td><input type="number" name="edad" value="{{ c[5] }}" required></td>
-                    <td><input type="date" name="fecha_registro" value="{{ c[6]|safe }}" required></td>
+                   
                     <td>
                         <button type="submit" class="btn-editar">Editar</button>
                         <a href="{{ url_for('clientes.eliminar_cliente', id_cliente=c[0]) }}" class="btn-eliminar" onclick="return confirm('¿Deseas eliminar este cliente?')">Eliminar</a>

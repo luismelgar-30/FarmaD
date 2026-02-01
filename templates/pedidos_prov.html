@@ -134,8 +134,8 @@
                         <td>{{ p.fecha }}</td>
                         <td>{{ p.estipulado }}</td>
                         <td>{{ p.cantidad }}</td>
-                        <td>${{ p.precio | round(2) }}</td>
-                        <td><span style="font-weight: 700;">${{ p.suma_total | round(2) }}</span></td>
+                        <td>L{{ p.precio | round(2) }}</td>
+                        <td><span style="font-weight: 700;">L{{ p.suma_total | round(2) }}</span></td>
                         <td>
                             
                             <span class="alerta-{{ p.alerta | lower | replace(' ', '-') }}">

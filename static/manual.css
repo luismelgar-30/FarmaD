@@ -5,7 +5,16 @@
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     color: #333;
 }
-
+.btn-bback {
+    background-color: #3b82f6;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+}
 .manual-container h2 {
     text-align: center;
     color: #2980B9;

@@ -24,9 +24,11 @@
             
             {% if user_rol == 'administrador' %}
     <a href="{{ url_for('roles_bp.roles_list') }}" class="sidebar-nav-item">Roles</a>
+    <a href="{{ url_for('cai.cai_home') }}" class="sidebar-nav-item">Gestión de CAI</a>
 {% endif %}
 
             
+            <a href="{{ url_for('facturas.factura_home') }}" class="sidebar-nav-item">Facturar</a>
             <a href="{{ url_for('creditos') }}" class="sidebar-nav-item">Créditos/Información</a>
             <a href="#" id="btn-config" class="sidebar-nav-item">Configuración</a>
             <a href="{{ url_for('manual') }}" class="sidebar-nav-item">Manual</a>

@@ -94,8 +94,8 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ item.id_inventario }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ item.producto }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">{{ item.cantidad }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${{ item.precio|round(2) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">${{ item.preciomulti|round(2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">L{{ item.precio|round(2) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-800">L{{ item.preciomulti|round(2) }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm">
                             {% set alerta_class = {
                                 'Stock bajo': 'bg-red-100 text-red-800',
@@ -248,7 +248,7 @@
         const cantidad = parseFloat(document.getElementById('cantidad_edit').value) || 0;
         const precio = parseFloat(document.getElementById('precio_edit').value) || 0;
         const preciomulti = (cantidad * precio).toFixed(2);
-        document.getElementById('preciomulti_display').textContent = `$${preciomulti}`;
+        document.getElementById('preciomulti_display').textContent = `L${preciomulti}`;
     }
 
     async function openEditModal(id) {

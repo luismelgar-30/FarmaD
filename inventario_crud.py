@@ -181,7 +181,7 @@ def editar_articulo(id_inventario):
             flash("Error: Cantidad y Precio deben ser números válidos.", 'error')
             return redirect(url_for('inventario.inventario_home'))
 
-        # Lógica de negocio (recalculando)
+      
         preciomulti = cantidad * precio
         alerta = get_alerta_status(cantidad)
         

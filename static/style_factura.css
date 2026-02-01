@@ -1,0 +1,39 @@
+.container-factura { max-width: 800px; margin: 20px auto; }
+.card-factura { background: #fff; border-radius: 10px; overflow: hidden; }
+.header-blue { background: #007bff; color: white; padding: 15px; text-align: center; }
+.section-title { 
+    background: #f8f9fa; 
+    padding: 8px 15px; 
+    margin: 20px 0 10px; 
+    border-left: 5px solid #007bff; 
+    font-weight: bold; 
+    color: #333;
+}
+.row-form { display: flex; gap: 20px; margin-bottom: 15px; }
+.field { flex: 1; }
+.field-wide { flex: 2; }
+.form-control { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; }
+.grey { background-color: #e9ecef; }
+.section-totals { 
+    background: #343a40; 
+    color: white; 
+    padding: 20px; 
+    border-radius: 8px; 
+    margin-top: 20px; 
+}
+.total-row { display: flex; justify-content: space-between; margin-bottom: 10px; align-items: center; }
+.total-row input { background: transparent; border: none; color: white; text-align: right; font-size: 1.1em; width: 120px; }
+.total-row.final { border-top: 1px solid #555; pt-10; font-size: 1.4em; font-weight: bold; }
+.total-row.final input { font-size: 1em; color: #00ff00; }
+.btn-facturar { 
+    width: 100%; 
+    padding: 15px; 
+    background: #28a745; 
+    color: white; 
+    border: none; 
+    border-radius: 5px; 
+    font-size: 1.2em; 
+    cursor: pointer; 
+    margin-top: 20px; 
+}
+.btn-facturar:hover { background: #218838; }
